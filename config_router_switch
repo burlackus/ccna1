@@ -1,0 +1,141 @@
+###ROUTER CENTRAL
+
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+service password-encryption
+security passwords min-length 8
+!
+hostname Exemplu
+!
+login block-for 120 attempts 2 within 30
+!
+!
+enable secret 5 $1$mERr$8BPXRaZKXzJUe84Ckfffz.
+!
+!
+!
+!
+!
+!
+ip cef
+ipv6 unicast-routing
+!
+no ipv6 cef
+!
+!
+!
+username student privilege 15 secret 5 $1$mERr$XL1OadnGfKu2zrckBjCx.1
+!
+!
+!
+!
+!
+!
+!
+!
+ip ssh version 2
+ip domain-name telacad.ro
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/0
+ description toReteaCladireaPrincipala
+ ip address 192.168.10.126 255.255.255.192
+ duplex auto
+ speed auto
+ ipv6 address FE80::1 link-local
+ ipv6 address 2001: ACAD:CAFE:A::1/64
+!
+interface FastEthernet0/1
+ description toReteaServer
+ ip address 192.168.10.190 255.255.255.224
+ duplex auto
+ speed auto
+ ipv6 address FE80::1 link-local
+ ipv6 address 2001:ACAD:CAFE:B::1/64
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+ip classless
+!
+ip flow-export version 9
+!
+!
+ip access-list extended sl_def_acl
+ deny tcp any any eq telnet
+ deny tcp any any eq www
+ deny tcp any any eq 22
+ permit tcp any any eq 22
+!
+banner motd ^CRouter Central - don`t enter^C
+!
+!
+!
+!
+!
+line con 0
+ exec-timeout 60 0
+ password 7 0822455D0A165445415F59
+ logging synchronous
+ login
+!
+line aux 0
+ exec-timeout 60 0
+ password 7 0822455D0A165445415F59
+ logging synchronous
+ login
+!
+line vty 0 4
+ access-class sl_def_acl in
+ exec-timeout 60 0
+ logging synchronous
+ login local
+ transport input ssh
+!
+!
+!
+end
+
+
+####SWITCH####
+
+
+hostname SwServere
+!
+enable secret 5 $1$mERr$WvpW0n5HghRrqnrwXCUUl.
+interface Vlan1
+ description SVI_SW_SERVER
+ ip address 192.168.10.189 255.255.255.224
+!
+ip default-gateway 192.168.10.190
+!
+banner motd ^CSW Servere - don`t enter^C
+!
+!
+!
+line con 0
+ password cisco12345
+ logging synchronous
+ login
+ exec-timeout 60 0
+!
+line vty 0 4
+ exec-timeout 60 0
+ password cisco12345
+ logging synchronous
+ login
+line vty 5 15
+ login
+!
+!
+!
+!
+end
